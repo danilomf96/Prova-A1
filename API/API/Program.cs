@@ -57,6 +57,7 @@ app.MapPost("/api/tarefas/cadastrar", ([FromServices] AppDataContext ctx, [FromB
 //PUT: http://localhost:5273/tarefas/alterar/{id}
 app.MapPut("/api/tarefas/alterar/{id}", ([FromServices] AppDataContext ctx, [FromRoute] string TarefaId) =>
 {
+
     Tarefa? tarefa = ctx.Tarefas.Find(TarefaId);
     if (tarefa == null)
     {
@@ -70,7 +71,14 @@ app.MapPut("/api/tarefas/alterar/{id}", ([FromServices] AppDataContext ctx, [Fro
     {
         tarefa.Status = "Concluida";
     }
+    else
+    {
+        return Results.BadRequest("Status da tarefa inválido ou já concluído");
+    }
+    ctx.SaveChanges();
+    return Results.Ok(tarefa);
 });
+
 
 //GET: http://localhost:5273/tarefas/naoconcluidas
 app.MapGet("/api/tarefas/naoconcluidas", ([FromServices] AppDataContext ctx) =>
