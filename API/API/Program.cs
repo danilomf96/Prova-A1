@@ -57,19 +57,31 @@ app.MapPost("/api/tarefas/cadastrar", ([FromServices] AppDataContext ctx, [FromB
 //PUT: http://localhost:5273/tarefas/alterar/{id}
 app.MapPut("/api/tarefas/alterar/{id}", ([FromServices] AppDataContext ctx, [FromRoute] string id) =>
 {
-    //Implementar a alteração do status da tarefa
+    Tarefa? tarefa = ctx.Tarefa.Find(id)
+    if (tarefa.status == "Não iniciada")
+    {
+        tarefa.status = "Em Andamento";
+    }
+    else(tarefa.status == "Em Andamento")
+    {
+        tarefa.status = "Concluida";        
+    }
+    ctx.Tarefas.Add(tarefa);
+    ctx.SaveChanges(); 
+    ctx.SaveChanges();urn Results.Created("",)
 });
 
 //GET: http://localhost:5273/tarefas/naoconcluidas
 app.MapGet("/api/tarefas/naoconcluidas", ([FromServices] AppDataContext ctx) =>
 {
-    //Implementar a listagem de tarefas não concluídas
+        return Results.Ok(ctx.Tarefas.Where(x => x.status != "Concluida").ToList());
 });
 
 //GET: http://localhost:5273/tarefas/concluidas
 app.MapGet("/api/tarefas/concluidas", ([FromServices] AppDataContext ctx) =>
 {
-    //Implementar a listagem de tarefas concluídas
+    return Results.Ok(ctx.Tarefas.Where(x => x.status == "Concluida").ToList());
 });
+
 
 app.Run();
